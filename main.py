@@ -23,10 +23,11 @@ elixir = Item('Elexir', 'potion', 'Fully restores hp and mp', 50)
 grenade = Item('Grenade', 'attack', 'Deals 500 damage', 500)
 poison = Item('Poison', 'poison', 'Deals 25 damage per turn', 25)
 
+player_spells = [thunder, fire, blizzard, meteor, quake, cure, heal]
+player_items = [potion, big, pint, elixir, grenade, poison]
 # Instantiate person with hp, mp, atk, df, magic
-player = Person(460, 65, 50, 35, [
-                thunder, fire, blizzard, meteor, quake, cure, heal])
-enemy = Person(1000, 65, 45, 25, [])
+player = Person(460, 65, 50, 35, player_spells, player_items)
+enemy = Person(1000, 65, 45, 25, [], [])
 
 running = True
 
@@ -47,6 +48,9 @@ while running:
         player.choose_magic()
         magic_choice = int(input('Choose magic: ')) - 1
 
+        if magic_choice == -1:
+            continue
+
         spell = player.magic[magic_choice]
         magic_dmg = spell.generate_damage()
 
@@ -66,6 +70,12 @@ while running:
             enemy.take_damage(magic_dmg)
             print(bcolors.OKBLUE + '\n' + spell.name + ' deals',
                   str(magic_dmg), 'points of damage' + bcolors.ENDC)
+    elif index == 2:
+        player.choose_item()
+        item_choice = int(input('Choose item:')) - 1
+
+        if item_choice == -1:
+            continue
 
     enemy_choice = 1
 
