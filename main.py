@@ -14,6 +14,15 @@ quake = Spell('Quake', 32, 350, 'black')
 cure = Spell('Cure', 12, 120, 'white')
 heal = Spell('Heal', 22, 200, 'white')
 
+# Instantiate item with name, type, description, prop
+potion = Item('Potion', 'potion', 'Heals 75 HP', 50)
+big = Item('Big Potion', 'potion', 'Heals 150 HP', 50)
+pint = Item('Pint of Potion', 'potion', 'Heals 350 HP', 50)
+elixir = Item('Elexir', 'potion', 'Fully restores hp and mp', 50)
+
+grenade = Item('Grenade', 'attack', 'Deals 500 damage', 500)
+poison = Item('Poison', 'poison', 'Deals 25 damage per turn', 25)
+
 # Instantiate person with hp, mp, atk, df, magic
 player = Person(460, 65, 50, 35, [
                 thunder, fire, blizzard, meteor, quake, cure, heal])
