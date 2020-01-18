@@ -21,10 +21,16 @@ pint = Item('Pint of Potion', 'potion', 'Heals 350 HP', 50)
 elixir = Item('Elexir', 'potion', 'Fully restores hp and mp', 50)
 
 grenade = Item('Grenade', 'attack', 'Deals 500 damage', 500)
+
 poison = Item('Poison', 'poison', 'Deals 25 damage per turn', 25)
 
 player_spells = [thunder, fire, blizzard, meteor, quake, cure, heal]
-player_items = [potion, big, pint, elixir, grenade, poison]
+player_items = [{'item': potion, 'quantity': 5},
+                {'item': big, 'quantity': 4},
+                {'item': pint, 'quantity': 3},
+                {'item': elixir, 'quantity': 1},
+                {'item': grenade, 'quantity': 2},
+                {'item': poison, 'quantity': 4}]
 # Instantiate person with hp, mp, atk, df, magic
 player = Person(460, 65, 50, 35, player_spells, player_items)
 enemy = Person(1000, 65, 45, 25, [], [])
@@ -32,6 +38,7 @@ enemy = Person(1000, 65, 45, 25, [], [])
 running = True
 
 print(bcolors.FAIL + bcolors.BOLD + 'An enemy attacks' + bcolors.ENDC)
+poison = 0
 
 while running:
     print('===============================')
@@ -42,8 +49,8 @@ while running:
     if index == 0:
         dmg = player.generate_damage()
         enemy.take_damage(dmg)
-        print('You attacked for', dmg,
-              'points of damage.')
+        print('You attacked for ' + bcolors.OKGREEN + str(dmg) +
+              ' points ' + bcolors.ENDC + 'of damage.')
     elif index == 1:
         player.choose_magic()
         magic_choice = int(input('Choose magic: ')) - 1
@@ -72,16 +79,49 @@ while running:
                   str(magic_dmg), 'points of damage' + bcolors.ENDC)
     elif index == 2:
         player.choose_item()
-        item_choice = int(input('Choose item:')) - 1
+        item_choice = int(input('Choose item: ')) - 1
 
         if item_choice == -1:
             continue
+
+        item = player.items[item_choice]['item']
+
+        if player_items[item_choice]['quantity'] == 0:
+            print(bcolors.FAIL + '\n' + 'None left...' + bcolors.ENDC)
+            continue
+
+        player_items[item_choice]['quantity'] -= 1
+
+        if item.type == 'potion':
+            player.heal(item.prop)
+            print(bcolors.OKGREEN + '\n' + item.name +
+                  ' heals for', str(item.prop), 'HP' + bcolors.ENDC)
+        elif item.type == 'elixir':
+            player.hp = player.maxhp
+            player.mp = player.maxmp
+            print(bcolors.OKGREEN + '\n' + item.name +
+                  'fully restores your HP and MP' + bcolors.ENDC)
+        elif item.type == 'attack':
+            enemy.take_damage(item.prop)
+            print(bcolors.OKGREEN + '\n' + item.name +
+                  ' damages the enemy for ', str(item.prop), 'HP' + bcolors.ENDC)
+        elif item.type == 'poison':
+            poison += item.prop
+            print(item.name + bcolors.OKGREEN +
+                  ' poisons' + bcolors.ENDC + ' the enemy for', str(item.prop), 'points.')
 
     enemy_choice = 1
 
     enemy_dmg = enemy.generate_damage()
     player.take_damage(enemy_dmg)
-    print('Enemy attacks for', enemy_dmg, 'points of damage.')
+
+    if poison > 0:
+        enemy.take_damage(poison)
+        print('Enemy attacks for ', bcolors.FAIL + enemy_dmg + ' points ' + bcolors.ENDC + 'of damage. The enemy also took ' + bcolors.ENDC +
+              bcolors.OKGREEN + str(poison) + ' poison' + bcolors.ENDC + ' damage.')
+    else:
+        print('Enemy attacks for ' + bcolors.FAIL + str(enemy_dmg) +
+              ' points ' + bcolors.ENDC + 'of damage.')
 
     print('Enemy HP:', bcolors.FAIL + str(enemy.get_hp()) +
           '/' + str(enemy.get_max_hp()) + bcolors.ENDC)
@@ -89,7 +129,7 @@ while running:
     print('Your HP:', bcolors.OKGREEN + str(player.get_hp()) +
           '/' + str(player.get_max_hp()) + bcolors.ENDC)
 
-    print('Your MP:', bcolors.OKGREEN + str(player.get_mp()) +
+    print('Your MP:', bcolors.OKBLUE + str(player.get_mp()) +
           '/' + str(player.get_max_mp()) + bcolors.ENDC)
 
     if enemy.get_hp() == 0:
