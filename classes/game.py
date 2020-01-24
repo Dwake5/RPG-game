@@ -88,6 +88,28 @@ class Person:
             i += 1
         print('    0: Back')
 
+    def get_enemy_stats(self):
+        hp_bar = ''
+        bar_fill = self.hp / self.maxhp * 50
+
+        while bar_fill > 0:
+            hp_bar += '█'
+            bar_fill -= 1
+
+        while len(hp_bar) < 50:
+            hp_bar += ' '
+
+        hp_fill = len(str(self.maxhp)) - len(str(self.hp))
+        hp_spacing = ''
+
+        while hp_fill > 0:
+            hp_spacing += ' '
+            hp_fill -= 1
+
+        print('                     __________________________________________________')
+        print('' + bcolors.BOLD + self.name + ': ' + hp_spacing + str(self.hp) + '/' + str(self.maxhp) + ' |' + bcolors.FAIL + hp_bar +
+              bcolors.ENDC + '|')
+
     def get_stats(self):
         hp_bar = ''
         bar_fill = self.hp / self.maxhp * 25
@@ -107,10 +129,36 @@ class Person:
             bar_fill -= 1
 
         while len(mp_bar) < 10:
-            mp_bar += ' '    
+            mp_bar += ' '
 
-            
+        hp_fill = len(str(self.maxhp)) - len(str(self.hp))
+        hp_spacing = ''
 
-        print('                    _________________________            __________')
-        print('' + bcolors.BOLD + self.name + ':   ' + str(self.hp) + '/' + str(self.maxhp) + ' |' + bcolors.OKGREEN + hp_bar +
-              bcolors.ENDC + bcolors.BOLD + '|   ' + str(self.mp) + '/' + str(self.maxmp) + '  |' + bcolors.OKBLUE + mp_bar + bcolors.ENDC + '|')
+        while hp_fill > 0:
+            hp_spacing += ' '
+            hp_fill -= 1
+
+        mp_fill = len(str(self.maxmp)) - len(str(self.mp))
+        mp_spacing = ''
+
+        while mp_fill > 0:
+            mp_spacing += ' '
+            mp_fill -= 1
+
+        top_space = ''
+        str_len = len(str(self.mp) + '/' + str(self.maxmp))-5
+        str_len += 7 - len(str(self.mp) + '/' + str(self.maxmp))
+        while str_len > 0:
+            top_space += ' '
+            str_len -= 1
+
+        mid_space = ''
+        mid_len = 7 - len(str(self.mp) + '/' + str(self.maxmp))
+        while mid_len > 0:
+            mid_space += ' '
+            mid_len -= 1
+
+        print('                    _________________________       ' +
+              top_space + '     __________')
+        print('' + bcolors.BOLD + self.name + ':   ' + hp_spacing + str(self.hp) + '/' + str(self.maxhp) + ' |' + bcolors.OKGREEN + hp_bar +
+              bcolors.ENDC + bcolors.BOLD + '|   ' + mp_spacing + str(self.mp) + '/' + str(self.maxmp) + mid_space + '  |' + bcolors.OKBLUE + mp_bar + bcolors.ENDC + '|')
