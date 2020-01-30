@@ -1,7 +1,6 @@
 import random
 from .magic import Spell
 
-
 class bcolors:
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
@@ -182,3 +181,13 @@ class Person:
               top_space + '     __________')
         print('' + bcolors.BOLD + self.name + '    ' + hp_spacing + str(self.hp) + '/' + str(self.maxhp) + ' |' + bcolors.OKGREEN + hp_bar +
               bcolors.ENDC + bcolors.BOLD + '|   ' + mp_spacing + str(self.mp) + '/' + str(self.maxmp) + mid_space + '  |' + bcolors.OKBLUE + mp_bar + bcolors.ENDC + '|')
+
+    def choose_enemy_spell(self):
+        spell_chosen = random.randrange(0, len(self.magic))
+        spell = self.magic[spell_chosen]
+        magic_dmg = spell.generate_damage()
+
+        if self.mp < spell.cost:
+            self.choose_enemy_spell()
+        else:
+            return spell, magic_dmg

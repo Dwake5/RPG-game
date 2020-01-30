@@ -2,7 +2,7 @@ from classes.game import Person, bcolors
 from classes.magic import Spell
 from classes.inventory import Item
 
-import random as rand
+import random as random
 # Instantiate spell with name, cost, dmg, type
 # Black magic
 thunder = Spell('Thunder', 10, 1500, 'black')
@@ -22,10 +22,7 @@ pint = Item('Pint of Potion', 'potion', 'Heals 350 HP', 50)
 elixir = Item('Elexir', 'potion', 'Fully restores hp and mp', 50)
 megaElixir = Item('MegaElexir', 'potion',
                   'Fully restores parties hp and mp', 50)
-
 grenade = Item('Grenade', 'attack', 'Deals 500 damage', 500)
-
-# poison = Item('Poison', 'poison', 'Deals 25 damage per turn', 25)
 
 player_spells = [thunder, fire, blizzard, meteor, quake, cure, heal]
 player_items = [{'item': potion, 'quantity': 5},
@@ -34,7 +31,6 @@ player_items = [{'item': potion, 'quantity': 5},
                 {'item': elixir, 'quantity': 2},
                 {'item': megaElixir, 'quantity': 1},
                 {'item': grenade, 'quantity': 2},
-                # {'item': poison, 'quantity': 4}
                 ]
 
 # Instantiate person with hp, mp, atk, df, magic
@@ -42,16 +38,15 @@ player1 = Person('Valos', 1000, 265, 1000, 35, player_spells, player_items)
 player2 = Person('Tom  ', 2460, 65, 50, 35, player_spells, player_items)
 player3 = Person('Mick ', 1460, 65, 50, 35, player_spells, player_items)
 
-enemy2 = Person('Orc   ', 2500, 165, 550, 125, [], [])
-enemy1 = Person('Demon ', 10000, 701, 600, 50, [], [])
-enemy3 = Person('Goblin', 2500, 165, 550, 125, [], [])
+enemy1 = Person('Orc   ', 2500, 165, 550, 125, [thunder, fire], [])
+enemy2 = Person('Demon ', 10000, 701, 600, 50, [blizzard, meteor, quake], [])
+enemy3 = Person('Goblin', 2500, 165, 550, 125, [thunder, fire], [])
 
 players = [player1, player2, player3]
 enemies = [enemy1, enemy2, enemy3]
 running = True
 
-print(bcolors.FAIL + bcolors.BOLD + 'An enemy attacks' + bcolors.ENDC)
-# poison = 0
+print(bcolors.FAIL + bcolors.BOLD + 'Enemies attacks, defeat the Demon to win' + bcolors.ENDC)
 
 while running:
     print('===============================')
@@ -63,6 +58,16 @@ while running:
 
     for enemy in enemies:
         enemy.get_enemy_stats()
+
+    # Check if you have died
+    defeated_players = 0
+    for player in players:
+        if player.get_hp() == 0:
+            defeated_players += 1
+
+    if defeated_players == 3:
+        print(bcolors.FAIL + 'Your party has died!' + bcolors.ENDC)
+        running = False
 
     for player in players:
 
@@ -77,7 +82,7 @@ while running:
                 enemy = player.choose_target(enemies)
 
                 enemies[enemy].take_damage(dmg)
-                print('You attacked ' + enemies[enemy].name.strip() + ' for ' + bcolors.OKGREEN + str(dmg) +
+                print(player.name.strip() + ' attacked ' + enemies[enemy].name.strip() + ' for ' + bcolors.OKGREEN + str(dmg) +
                       ' points ' + bcolors.ENDC + 'of damage.')
 
                 if enemies[enemy].get_hp() == 0:
@@ -141,8 +146,8 @@ while running:
                     player.heal(item.prop)
                     print(bcolors.OKGREEN + '\n' + item.name +
                           ' heals for', str(item.prop), 'HP' + bcolors.ENDC)
-                elif item.type == 'elixir':
 
+                elif item.type == 'elixir':
                     if item.name == 'MegaElixer':
                         for i in players:
                             i.hp = i.maxhp
@@ -156,50 +161,48 @@ while running:
                               'fully restores your HP and MP' + bcolors.ENDC)
 
                 elif item.type == 'attack':
-
                     enemy = player.choose_target(enemies)
-
                     enemies[enemy].take_damage(item.prop)
-
                     print(bcolors.OKGREEN + '\n' + item.name +
                           ' damages ' + enemies[enemy].name.strip() + ' for ', str(item.prop), 'HP' + bcolors.ENDC)
 
-                    if enemies[enemy].get_hp() == 0:
-                        print(enemies[enemy].name.strip() + ' has died.')
-                        del enemies[enemy]
+                # Declare and then remove an enemy if it dies
+                if enemies[enemy].get_hp() == 0:
+                    print(enemies[enemy].name.strip() + ' has died.')
+                    del enemies[enemy]
 
-                # elif item.type == 'poison':
-                #     poison += item.prop
-                #     print(item.name + bcolors.OKGREEN +
-                #           ' poisons' + bcolors.ENDC + ' the enemy for', str(item.prop), 'points.')
         else:
             break
 
+    print('\n' + 'Enemies Turn:')
+    # Check if you have won (only need to defeat the 'boss')
+    if enemies[1].get_hp() == 0:
+        print(bcolors.OKGREEN + 'The demon has been slain. You win!' + bcolors.ENDC)
+        running = False
+
+    # Enemy attacks
     for enemy in enemies:
-        enemy_choice = 1
-        target = rand.randrange(0, 3)
-        enemy_dmg = enemies[0].generate_damage()
+        enemy_choice = random.randrange(0, 10)
 
-        players[target].take_damage(enemy_dmg)
+        # 50% chance of attacking
+        if enemy_choice < 6:
+            target = random.randrange(0, 3)
+            enemy_dmg = enemy.generate_damage()
 
-        # if poison > 0:
-        #     enemy.take_damage(poison)
-        #     print('Enemy attacks for ', bcolors.FAIL + enemy_dmg + ' points ' + bcolors.ENDC + 'of damage. The enemy also took ' + bcolors.ENDC +
-        #           bcolors.OKGREEN + str(poison) + ' poison' + bcolors.ENDC + ' damage.')
+            players[target].take_damage(enemy_dmg)
+            print(enemy.name.strip() + ' attacks ' + players[target].name.strip() + ' for ' + bcolors.FAIL + str(enemy_dmg) +
+              ' points ' + bcolors.ENDC + 'of damage.')
 
-        print('Enemy attacks ' + players[target].get_name().strip() + ' for ' + bcolors.FAIL + str(enemy_dmg) +
-            ' points ' + bcolors.ENDC + 'of damage.')
+        # 30% chance of magic
+        elif enemy_choice < 10:
+            spell, magic_dmg = enemy.choose_enemy_spell()
+            enemy.reduce_mp(spell.cost)
 
-    defeated_players = 0
+            target = random.randrange(0, 3)
+            players[target].take_damage(magic_dmg)
 
-    for player in players:
-        if player.get_hp() == 0:
-            defeated_players += 1
+            print(enemy.name.strip() + "'s " + bcolors.OKBLUE + spell.name + bcolors.ENDC + ' deals ' + str(magic_dmg) + ' points ' + bcolors.ENDC + 'of damage to ' + players[target].name.strip() + '.')
 
-    if defeated_players == 3:
-        print(bcolors.FAIL + 'Your party has died!' + bcolors.ENDC)
-        running = False
-
-    if enemy[0].get_hp() == 0:
-        print(bcolors.OKGREEN + 'You win!' + bcolors.ENDC)
-        running = False
+            if players[target].get_hp() == 0:
+                print(players[target].name.strip() + ' has died.')
+                del players[target]
