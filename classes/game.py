@@ -44,6 +44,9 @@ class Person:
     def get_hp(self):
         return self.hp
 
+    def get_name(self):
+        return self.name
+
     def get_max_hp(self):
         return self.maxhp
 
@@ -64,6 +67,16 @@ class Person:
         for item in self.actions:
             print('    ' + str(i) + ':', item)
             i += 1
+
+    def choose_target(self, enemies):
+        i = 1
+        print('\n' + bcolors.FAIL + bcolors.BOLD + '    Target:' + bcolors.ENDC)
+        for enemy in enemies:
+            if enemy.get_hp != 0:
+                print('        ' + str(i) + '.', enemy.name)
+                i += 1
+        choice = int(input('    Choose target: ')) - 1
+        return choice
 
     def choose_magic(self):
         i = 1
@@ -106,8 +119,15 @@ class Person:
             hp_spacing += ' '
             hp_fill -= 1
 
+        spacing = ''
+        health_length = len(str(self.maxhp)) + len(str(self.hp))
+        fill = 10 - health_length
+        while fill > 0:
+            spacing += ' '
+            fill -= 1
+
         print('                     __________________________________________________')
-        print('' + bcolors.BOLD + self.name + ': ' + hp_spacing + str(self.hp) + '/' + str(self.maxhp) + ' |' + bcolors.FAIL + hp_bar +
+        print('' + bcolors.BOLD + self.name + '  ' + hp_spacing + str(self.hp) + '/' + str(self.maxhp) + spacing + ' |' + bcolors.FAIL + hp_bar +
               bcolors.ENDC + '|')
 
     def get_stats(self):
@@ -160,5 +180,5 @@ class Person:
 
         print('                    _________________________       ' +
               top_space + '     __________')
-        print('' + bcolors.BOLD + self.name + ':   ' + hp_spacing + str(self.hp) + '/' + str(self.maxhp) + ' |' + bcolors.OKGREEN + hp_bar +
+        print('' + bcolors.BOLD + self.name + '    ' + hp_spacing + str(self.hp) + '/' + str(self.maxhp) + ' |' + bcolors.OKGREEN + hp_bar +
               bcolors.ENDC + bcolors.BOLD + '|   ' + mp_spacing + str(self.mp) + '/' + str(self.maxmp) + mid_space + '  |' + bcolors.OKBLUE + mp_bar + bcolors.ENDC + '|')
