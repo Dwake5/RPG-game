@@ -1,4 +1,5 @@
 import random
+import math
 from .magic import Spell
 
 class bcolors:
@@ -19,8 +20,8 @@ class Person:
         self.hp = hp
         self.maxmp = mp
         self.mp = mp
-        self.atkl = atk - 10
-        self.atkh = atk + 10
+        self.atkl = math.floor(atk * 0.9)
+        self.atkh = math.floor(atk * 1.1)
         self.df = df
         self.magic = magic
         self.items = items
@@ -114,7 +115,7 @@ class Person:
         hp_fill = len(str(self.maxhp)) - len(str(self.hp))
         hp_spacing = ''
 
-        while hp_fill > 0:
+        while hp_fill > 1:
             hp_spacing += ' '
             hp_fill -= 1
 
@@ -191,3 +192,6 @@ class Person:
             self.choose_enemy_spell()
         else:
             return spell, magic_dmg
+
+    def roll_defence(self):
+        return random.randrange(0, self.df)

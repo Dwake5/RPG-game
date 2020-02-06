@@ -13,5 +13,5 @@ class Spell:
             return self.dmg
         else:
             low = self.dmg * 0.8
-            high = self.dmg * 1.3
+            high = self.dmg * 1.4
             return random.randrange(low, high)

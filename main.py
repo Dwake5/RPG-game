@@ -2,27 +2,30 @@ from classes.game import Person, bcolors
 from classes.magic import Spell
 from classes.inventory import Item
 
+import math
 import random as random
+
 # Instantiate spell with name, cost, dmg, type
 # Black magic
-thunder = Spell('Thunder', 10, 1500, 'black')
-fire = Spell('Fire', 14, 2000, 'black')
-blizzard = Spell('Blizzard', 19, 2500, 'black')
-meteor = Spell('Meteor', 25, 3000, 'black')
-quake = Spell('Quake', 32, 3500, 'black')
+thunder = Spell('Thunder', 20, 300, 'black')
+fire = Spell('Fire', 28, 450, 'black')
+blizzard = Spell('Blizzard', 42, 600, 'black')
+meteor = Spell('Meteor', 70, 800, 'black')
+quake = Spell('Quake', 90, 1200, 'black')
 
 # White magic
-cure = Spell('Cure', 12, 1200, 'white')
-heal = Spell('Heal', 22, 2000, 'white')
+cure = Spell('Cure', 20, 500, 'white')
+heal = Spell('Heal', 40, 800, 'white')
+recover = Spell('Recover', 50, 2000, 'white')
 
 # Instantiate item with name, type, description, prop
-potion = Item('Potion', 'potion', 'Heals 75 HP', 50)
-big = Item('Big Potion', 'potion', 'Heals 150 HP', 50)
-pint = Item('Pint of Potion', 'potion', 'Heals 350 HP', 50)
-elixir = Item('Elexir', 'potion', 'Fully restores hp and mp', 50)
+potion = Item('Potion', 'potion', 'Heals 200 HP', 200)
+big = Item('Big Potion', 'potion', 'Heals 500 HP', 500)
+pint = Item('Pint of Potion', 'potion', 'Heals 1200 HP', 1200)
+elixir = Item('Elexir', 'potion', 'Fully restores hp and mp', 5000)
 megaElixir = Item('MegaElexir', 'potion',
-                  'Fully restores parties hp and mp', 50)
-grenade = Item('Grenade', 'attack', 'Deals 500 damage', 500)
+                  'Fully restores parties hp and mp', 5000)
+grenade = Item('Grenade', 'attack', 'Deals 2000 damage', 2000)
 
 player_spells = [thunder, fire, blizzard, meteor, quake, cure, heal]
 player_items = [{'item': potion, 'quantity': 5},
@@ -33,20 +36,21 @@ player_items = [{'item': potion, 'quantity': 5},
                 {'item': grenade, 'quantity': 2},
                 ]
 
-# Instantiate person with hp, mp, atk, df, magic
-player1 = Person('Valos', 1000, 265, 1000, 35, player_spells, player_items)
-player2 = Person('Tom  ', 2460, 65, 50, 35, player_spells, player_items)
-player3 = Person('Mick ', 1460, 65, 50, 35, player_spells, player_items)
+# Instantiate person with hp, mp, atk, df, magic, items
+player1 = Person('Valos', 1200, 260, 120, 40, player_spells, player_items)
+player2 = Person('Tom  ', 2400, 150, 250, 90, player_spells, player_items)
+player3 = Person('Mick ', 1600, 120, 375, 140, player_spells, player_items)
 
-enemy1 = Person('Orc   ', 2500, 165, 550, 125, [thunder, fire], [])
-enemy2 = Person('Demon ', 10000, 701, 600, 50, [blizzard, meteor, quake], [])
-enemy3 = Person('Goblin', 2500, 165, 550, 125, [thunder, fire], [])
+enemy1 = Person('Orc   ', 2500, 165, 250, 125, [thunder, fire], [])
+enemy2 = Person('Demon ', 10000, 200, 300, 150, [blizzard, meteor, quake], [])
+enemy3 = Person('Goblin', 2500, 165, 250, 125, [thunder, fire], [])
 
 players = [player1, player2, player3]
 enemies = [enemy1, enemy2, enemy3]
 running = True
 
-print(bcolors.FAIL + bcolors.BOLD + 'Enemies attacks, defeat the Demon to win' + bcolors.ENDC)
+print(bcolors.FAIL + bcolors.BOLD +
+      'Enemies attack, defeat the Demon to win!' + bcolors.ENDC)
 
 while running:
     print('===============================')
@@ -59,7 +63,7 @@ while running:
     for enemy in enemies:
         enemy.get_enemy_stats()
 
-    # Check if you have died
+    # Check if all have died
     defeated_players = 0
     for player in players:
         if player.get_hp() == 0:
@@ -80,6 +84,10 @@ while running:
             if index == 0:
                 dmg = player.generate_damage()
                 enemy = player.choose_target(enemies)
+
+                reduction = enemies[enemy].roll_defence()
+                print(reduction)
+                dmg = max(dmg-reduction, 0)
 
                 enemies[enemy].take_damage(dmg)
                 print(player.name.strip() + ' attacked ' + enemies[enemy].name.strip() + ' for ' + bcolors.OKGREEN + str(dmg) +
@@ -119,8 +127,8 @@ while running:
 
                     enemies[enemy].take_damage(magic_dmg)
 
-                    print(bcolors.OKBLUE + '\n' + spell.name + ' deals',
-                          str(magic_dmg), 'points of damage to ' + enemies[enemy].name.strip() + bcolors.ENDC)
+                    print(bcolors.OKBLUE + '\n' + spell.name + bcolors.ENDC + ' deals' + bcolors.FAIL +
+                          str(magic_dmg) + bcolors.ENDC + 'points of damage to ' + enemies[enemy].name.strip() + bcolors.ENDC)
 
                     if enemies[enemy].get_hp() == 0:
                         print(enemies[enemy].name.strip() + ' has died.')
@@ -184,16 +192,16 @@ while running:
     for enemy in enemies:
         enemy_choice = random.randrange(0, 10)
 
-        # 50% chance of attacking
+        # 60% chance of attacking
         if enemy_choice < 6:
             target = random.randrange(0, 3)
             enemy_dmg = enemy.generate_damage()
 
             players[target].take_damage(enemy_dmg)
             print(enemy.name.strip() + ' attacks ' + players[target].name.strip() + ' for ' + bcolors.FAIL + str(enemy_dmg) +
-              ' points ' + bcolors.ENDC + 'of damage.')
+                  ' points ' + bcolors.ENDC + 'of damage.')
 
-        # 30% chance of magic
+        # 40% chance of magic
         elif enemy_choice < 10:
             spell, magic_dmg = enemy.choose_enemy_spell()
             enemy.reduce_mp(spell.cost)
@@ -201,7 +209,8 @@ while running:
             target = random.randrange(0, 3)
             players[target].take_damage(magic_dmg)
 
-            print(enemy.name.strip() + "'s " + bcolors.OKBLUE + spell.name + bcolors.ENDC + ' deals ' + str(magic_dmg) + ' points ' + bcolors.ENDC + 'of damage to ' + players[target].name.strip() + '.')
+            print(enemy.name.strip() + "'s " + bcolors.OKBLUE + spell.name + bcolors.ENDC + ' deals ' +
+                  str(magic_dmg) + ' points ' + bcolors.ENDC + 'of damage to ' + players[target].name.strip() + '.')
 
             if players[target].get_hp() == 0:
                 print(players[target].name.strip() + ' has died.')
